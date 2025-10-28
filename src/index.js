@@ -23,13 +23,9 @@ function simplifyWeather(code) {
   return "Unknown";
 }
 
-const ipreq = async (req) => {
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
-  return ip;
-};
-
 app.get("/", async (req, res) => {
-  const ip = ipreq(req);
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
+
   try {
     const location = await fetch(`http://ipwho.is/${ip}`).then((r) => r.json());
     const lat = location.latitude;
