@@ -12,7 +12,9 @@ app.use(express.static("public"));
 
 app.get("/", (req, res) => {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
-  res.json({ message: "WORK PWEASE", ip });
+  const location = fetch(`https://ipapi.co/${ip}/json/`);
+
+  res.json({ message: "WORK PWEASE", ip, location });
 });
 
 app.listen(port, () => {
