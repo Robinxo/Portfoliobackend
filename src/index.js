@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
   const location = fetch(`https://ipapi.co/${ip}/json/`);
 
-  res.json({ message: "WORK PWEASE", ip, location });
+  res.json({ message: "Working", ip, location });
 });
 
 app.listen(port, () => {
