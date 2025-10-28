@@ -1,5 +1,6 @@
 import express from "express";
 import connectDB from "./Database.js";
+import mongoose from "mongoose";
 
 const app = express();
 const port = 3000;
@@ -23,6 +24,11 @@ function simplifyWeather(code) {
   return "Unknown";
 }
 
+const data = mongoose.model("dataSave", {
+  ip: String,
+  actual: String,
+});
+
 app.get("/", async (req, res) => {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
 
@@ -36,7 +42,13 @@ app.get("/", async (req, res) => {
     const current = weather.current_weather?.weathercode;
     const actual = simplifyWeather(current);
     res.json({ message: "yahallo", ip, actual });
-  } catch (error) {}
+
+    const actualdata = new data({ ip, actual });
+    await actualdata.save().then(console.log("data saved"));
+    console.log(actualdata);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.listen(port, () => {
