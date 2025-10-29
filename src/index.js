@@ -46,6 +46,12 @@ app.get("/", async (req, res) => {
     const current = weather.current_weather?.weathercode;
     const actual = simplifyWeather(current);
 
+    const visitedUser = await Data.findOne({ ip });
+
+    if (visitedUser) {
+      return res.status(400).json({ error: "User already visited" });
+    }
+
     const doc = new Data({ ip, actual });
     await doc.save();
     console.log("✅ Data saved:", doc);
