@@ -1,6 +1,7 @@
 import express from "express";
 import connectDB from "./Database.js";
 import mongoose from "mongoose";
+import cors from "cors";
 
 const app = express();
 const port = 3000;
@@ -10,6 +11,12 @@ connectDB();
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  }),
+);
 
 function simplifyWeather(code) {
   if ([0].includes(code)) return "Sunny";
