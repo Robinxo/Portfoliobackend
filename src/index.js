@@ -24,10 +24,13 @@ function simplifyWeather(code) {
   return "Unknown";
 }
 
-const data = mongoose.model("dataSave", {
-  ip: String,
-  actual: String,
-});
+const Data = mongoose.model(
+  "dataSave",
+  new mongoose.Schema({
+    ip: String,
+    actual: String,
+  }),
+);
 
 app.get("/", async (req, res) => {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
@@ -36,18 +39,21 @@ app.get("/", async (req, res) => {
     const location = await fetch(`http://ipwho.is/${ip}`).then((r) => r.json());
     const lat = location.latitude;
     const long = location.longitude;
+
     const weather = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current_weather=true`,
     ).then((r) => r.json());
     const current = weather.current_weather?.weathercode;
     const actual = simplifyWeather(current);
-    res.json({ message: "yahallo", ip, actual });
 
-    const actualdata = new data({ ip, actual });
-    await actualdata.save().then(console.log("data saved"));
-    console.log(actualdata);
+    const doc = new Data({ ip, actual });
+    await doc.save();
+    console.log("✅ Data saved:", doc);
+
+    res.json({ message: "yahallo", ip, actual });
   } catch (error) {
-    console.log(error);
+    console.error("❌ Error in / route:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

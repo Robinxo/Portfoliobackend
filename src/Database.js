@@ -3,13 +3,21 @@ import "dotenv/config";
 
 const DATABASE = process.env.DATABASE;
 
-const connectDB = async () => {
+let isConnected = false;
+
+export const connectDB = async () => {
+  if (isConnected) return;
+
   try {
-    const connectInstance = await mongoose.connect(`${DATABASE}`);
-    console.log(`MongoDB connected: ${connectInstance.connection.host}`);
-  } catch (error) {
-    console.log("MongoDB connection error", error);
-    process.exit(1);
+    const conn = await mongoose.connect(`${DATABASE}`, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 20000,
+    });
+    isConnected = true;
+    console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+  } catch (err) {
+    console.error("❌ MongoDB connection failed:", err.message);
+    throw err;
   }
 };
 
