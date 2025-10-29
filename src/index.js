@@ -26,10 +26,13 @@ function simplifyWeather(code) {
 
 const Data = mongoose.model(
   "dataSave",
-  new mongoose.Schema({
-    ip: String,
-    actual: String,
-  }),
+  new mongoose.Schema(
+    {
+      ip: { type: String, unique: true },
+      actual: String,
+    },
+    { timestamps: true },
+  ),
 );
 
 app.get("/", async (req, res) => {
