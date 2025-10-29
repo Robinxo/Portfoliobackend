@@ -30,6 +30,7 @@ const Data = mongoose.model(
     {
       ip: { type: String, unique: true },
       actual: String,
+      city: String,
     },
     { timestamps: true },
   ),
@@ -42,6 +43,7 @@ app.get("/", async (req, res) => {
     const location = await fetch(`http://ipwho.is/${ip}`).then((r) => r.json());
     const lat = location.latitude;
     const long = location.longitude;
+    const city = location.city;
 
     const weather = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current_weather=true`,
@@ -52,14 +54,14 @@ app.get("/", async (req, res) => {
     const visitedUser = await Data.findOne({ ip });
 
     if (visitedUser) {
-      return res.status(400).json({ error: "User already visited" });
+      return res.json({ message: "yahallo", ip, actual, city });
     }
 
-    const doc = new Data({ ip, actual });
+    const doc = new Data({ ip, actual, city });
     await doc.save();
     console.log("✅ Data saved:", doc);
 
-    res.json({ message: "yahallo", ip, actual });
+    res.json({ message: "yahallo", ip, actual, city });
   } catch (error) {
     console.error("❌ Error in / route:", error.message);
     res.status(500).json({ error: "Internal Server Error" });
